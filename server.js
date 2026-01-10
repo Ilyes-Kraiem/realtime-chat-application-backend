@@ -15,19 +15,24 @@ connectDB();
 
 const app = express();
 
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [CLIENT_URL],
     credentials: true,
   })
 );
+
 app.use(express.json());
 
 app.use("/api/user", userRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/message", messageRoutes);
 
-app.get("/", (req, res) => res.send("API is running..."));
+app.get("/", (req, res) => {
+  res.send("API is running...");
+});
 
 app.use(notFound);
 app.use(errorHandler);
@@ -37,7 +42,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   pingTimeout: 60000,
   cors: {
-    origin: ["http://localhost:3000", "http://localhost:5173"],
+    origin: [CLIENT_URL],
     credentials: true,
   },
 });
@@ -53,7 +58,7 @@ io.on("connection", (socket) => {
     const userId = userData._id.toString();
     socket.userId = userId;
 
-    socket.join(userId);
+    socket.join(userId); 
     socket.emit("connected");
 
     onlineUsers.add(userId);
@@ -61,7 +66,6 @@ io.on("connection", (socket) => {
     socket.emit("online users", Array.from(onlineUsers));
 
     console.log("✅ setup ok, user joined personal room:", userId);
-    console.log("🟢 user online:", userId);
   });
 
   socket.on("join chat", (roomId) => {
@@ -82,24 +86,18 @@ io.on("connection", (socket) => {
 
   socket.on("new message", (newMessage) => {
     try {
-      const chat = newMessage?.chat;
-      const chatId = chat?._id;
-
-      if (!chatId) {
-        console.log("❌ new message missing chat._id");
-        return;
-      }
-
-      console.log("📨 new message:", newMessage?._id, "chat:", chatId);
+      const chatId = newMessage?.chat?._id;
+      if (!chatId) return;
 
       socket.to(chatId).emit("message received", newMessage);
-
     } catch (err) {
       console.log("❌ new message socket error:", err.message);
     }
   });
+
   socket.on("disconnect", (reason) => {
     console.log("🔴 socket disconnected:", socket.id, "reason:", reason);
+
     if (socket.userId) {
       const userId = socket.userId.toString();
       onlineUsers.delete(userId);
@@ -108,5 +106,6 @@ io.on("connection", (socket) => {
     }
   });
 });
+
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
