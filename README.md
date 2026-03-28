@@ -55,7 +55,7 @@ The backend handles authentication, chat management, and real-time message deliv
 
 ## 🚀 Live API
 
-👉 https://your-render-link
+👉 https://realtime-chat-backend-2wno.onrender.com
 
 ---
 
@@ -63,7 +63,7 @@ The backend handles authentication, chat management, and real-time message deliv
 
 ```bash
 # Clone repository
-git clone https://github.com/your-username/realtime-chat-application-backend
+git clone https://github.com/Ilyes-Kraiem/realtime-chat-application-backend
 
 # Navigate to project
 cd realtime-chat-application-backend
@@ -73,19 +73,6 @@ npm install
 
 # Run server
 npm run start
-```
-
----
-
-## 🔗 Environment Variables
-
-Create a `.env` file and add:
-
-```
-PORT=5000
-MONGO_URI=your_mongodb_connection
-FRONTEND_URL=your_frontend_url
-JWT_SECRET=your_secret_key
 ```
 
 ---
